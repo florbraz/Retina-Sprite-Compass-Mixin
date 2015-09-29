@@ -1,0 +1,56 @@
+$ico: sprite-map("ico/*.png", $layout: 'smart');            // import 1x sprites, 10px padding
+$ico2x: sprite-map("ico-retina/*.png", $layout: 'smart');   // import 2x sprites, 20px padding 
+
+
+@mixin ico($name, $base64: false) {
+	@include _retina-sprite($name, $ico, $ico2x, $base64); 
+} 
+
+%sprite-ico-base {
+  content:" ";
+  display:inline-block;
+  position:relative; 
+  vertical-align:middle;
+}
+
+%sprite {
+  @extend %sprite-ico-base;
+  background-image: sprite-url($ico);
+  @media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+      background-image: sprite-url($ico2x);
+  }
+}
+
+%sprite64 {
+  @extend %sprite-ico-base;
+  background-image: inline-sprite($ico);
+  @media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+      background-image: inline-sprite($ico2x);
+  }
+}
+
+
+@mixin _retina-sprite($name, $ico, $ico2x, $base64, $dimensions: true, $pad: 0) {  
+  @if $dimensions == true {
+    @include sprite-dimensions($ico, $name);
+  }
+  @if $base64 == false {
+    @extend %sprite;    
+  } @else {
+    @extend %sprite64;
+  }
+  background-position: sprite-position($ico, $name, -$pad, -$pad);
+  background-repeat: no-repeat;  
+  
+  @if $pad > 0 {
+    padding: $pad;
+  }
+  
+  @media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+    & {
+      $pos: sprite-position($ico2x, $name, -$pad * 2, -$pad * 2);
+      background-position: nth($pos, 1) / 2 nth($pos, 2) / 2;
+      @include background-size(ceil(image-width(sprite-path($ico2x)) / 2) auto);
+    }
+  }
+}
